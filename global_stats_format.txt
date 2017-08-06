@@ -1,0 +1,35 @@
+After 24 hours, the following stats were made globally of those Summoners registered in our bot.
+
+Overall KDA: **%d/%d/%d**
+Wins: **%d**
+Losses: **%d**
+
+Total Damage: **%d**
+	- Magic Damage:       **%d**
+	- Physical Damage:    **%d**
+	- True Damage:        **%d**
+
+Tower Kills: **%d**
+
+Top Lane Players: **%d**
+Jungle Players: **%d**
+Mid Lane Players: **%d**
+Bottom Lane Players: **%d**
+
+Double Kills: **%d**
+Triple Kills: **%d**
+Quadra Kills: **%d**
+Penta Kills: **%d**
+*Unreal* Kills: **%d**
+
+Gold Earned: **%d**
+Minions Killed: **%d**
+
+Wards Placed: **%d**
+Wards Killed: **%d**
+
+Barrons Killed: **%d**
+Dragons Killed: **%d**
+Heralds Killed: **%d**
+
+*(these statistics were collected from %s EST to %s EST **(now)**)

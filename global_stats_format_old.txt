@@ -1,0 +1,17 @@
+After a day of bronze boosting, let's see the accumulative statistic for all registered Summoners.
+
+Over the last 24 hours, **%d** Summoners (from **%d** guilds) created the overall score of **%d/%d/%d**, with **%d** and **%d** losses.
+You all did **%d** total damage, with **%d** of that being *magic damage*, **%d** of it being *physical damage*, and **%d** of it being *true damage*. That's *(probably)* a fuckton.
+
+During the killing, your *(most likely)* inting top-laners took down **%d** towers. Speaking of inting top-laners, there were **%d** of those bastards, along with **%d** junglers, **%d** mid-laners, and **%d** bot-laners.
+Along with all those kills, **%d** of those were double kills, **%d** were triple kills, **%d** were quadra kills, and **%d** were penta kills. *(and **%d** were unreal kills :clap:)*
+
+Imagine League without gold. You probably could, figuring the amount of CS you miss; as you guys only made **%d** gold. How pathetic. You guys also only killed **%d** minions; reminds me of my Bronze I promos.
+
+Vision is important, as you'd be pretty blind without it. Placing **%d** wards, there probably isn't an excuse for missing most of your skillshots. *(exception: Lee Sin's Sonic Wave; having ward vision when you're blind turns out to be absolutely fucking useless.)*
+Even though you need vision, the enemy doesn't. You all destroyed a total of **%d** wards, so hopefully it was good enough.
+
+Stop being a god-awful KDA player and get a fucking objective once in a while. Getting only **%d** barons and **%d** dragons doesn't seem like you're playing for the objective. *(or does it; I can't see as I'm a text file.)*
+Now that Rift Herald isn't useless to shit, you junglers should be attempting to take it; as only **%d** of you have decided to.
+
+*(these statistics were recorded from **%s EST** to **%s EST**, and are reset every 24 hours)*
