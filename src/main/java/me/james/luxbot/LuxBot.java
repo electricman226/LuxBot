@@ -19,6 +19,7 @@ import sx.blah.discord.handle.obj.*;
 
 public class LuxBot extends BaseBot
 {
+    public static final File OUTPUT_TEXT_FILE = new File( "game_format.txt" );
     private static final String STANDARD_PLAYING_TEXT = "LuxBot: Tracking your terrible statistics.";
     private static final long LUXBOT_UPDATE_RATE = 300000L;
     private static final long GLOBAL_STATS_UPDATE_RATE = 86400000L;
@@ -55,6 +56,11 @@ public class LuxBot extends BaseBot
             e.printStackTrace();
             return;
         }
+        if ( !OUTPUT_TEXT_FILE.exists() )
+        {
+            System.out.println( "Missing required file " + OUTPUT_TEXT_FILE.getPath() + "." );
+            return;
+        }
         // Depending on where I debug this (or anyone else), this could either be local IP address, public IP address, or loopback (localhost/127.0.0.1)
         try
         {
@@ -79,9 +85,9 @@ public class LuxBot extends BaseBot
         BOT = new LuxBot();
     }
 
-    public static String formatGame( TrackSummoner s, Match m ) throws RiotApiException
+    public static String formatGame( TrackSummoner s, Match m ) throws RiotApiException, IOException
     {
-        String fmt = "Summoner **%s** **%s** a game on **%s** playing **%s**. Their score was **%d/%d/%d** with **%d** CS.";
+        String fmt = new String( Files.readAllBytes( OUTPUT_TEXT_FILE.toPath() ) );
         for ( ParticipantIdentity pi : m.getParticipantIdentities() )
             if ( pi.getPlayer() == null )
                 return null;
@@ -163,8 +169,10 @@ public class LuxBot extends BaseBot
                         DATABASE.prepareStatement( String.format( "UPDATE `last_games` SET `game_id`=%d WHERE `summoner_id`=%d AND `platform`='%s'", lg.getGameId(), sum.getSummoner().getId(), sum.getPlatform().getName() ) ).executeUpdate();
                     }
                 }
-            } catch ( RiotApiException | SQLException e )
+            } catch ( RiotApiException | SQLException | IOException e )
             {
+                if ( e instanceof IOException )
+                    BOT.getLogger().warning( "Unable to read game format file " + OUTPUT_TEXT_FILE.getPath() );
                 e.printStackTrace();
             }
         }
