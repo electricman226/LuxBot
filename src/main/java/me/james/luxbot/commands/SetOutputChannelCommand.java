@@ -16,6 +16,12 @@ public class SetOutputChannelCommand extends Command
             chan.sendMessage( "**Error:** You do not have permission to do this. (requires *Manage Server* permission)" );
             return "No permission.";
         }
+        if ( !chan.getModifiedPermissions( LuxBot.BOT.getBot().getOurUser() ).contains( Permissions.SEND_MESSAGES ) && LuxBot.BOT.getBot().getOurUser().getRolesForGuild( chan.getGuild() ).stream().noneMatch( r -> r.getPermissions().contains( Permissions.SEND_MESSAGES ) ) )
+        {
+            // We don't have permission to send messages in this channel, and Discord deprecated general channel, so DM the issuer.
+            user.getOrCreatePMChannel().sendMessage( "**Error:** I don't have permission to send messages into " + chan.mention() + "." );
+            return "No self permission.";
+        }
         try
         {
             LuxBot.DATABASE.prepareStatement( "INSERT INTO `guild_output_channels` (guild_id, channel_id) VALUES('" + chan.getGuild().getLongID() + "', '" + chan.getLongID() + "') ON DUPLICATE KEY UPDATE channel_id='" + chan.getLongID() + "'" ).executeUpdate();
