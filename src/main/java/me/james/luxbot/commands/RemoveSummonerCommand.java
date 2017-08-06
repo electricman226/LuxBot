@@ -5,12 +5,11 @@ import java.util.*;
 import me.james.basebot.command.*;
 import me.james.luxbot.*;
 import net.rithms.riot.api.*;
-import net.rithms.riot.api.endpoints.match.dto.*;
 import net.rithms.riot.api.endpoints.summoner.dto.*;
 import net.rithms.riot.constant.*;
 import sx.blah.discord.handle.obj.*;
 
-public class AddSummonerCommand extends Command
+public class RemoveSummonerCommand extends Command
 {
     @Override
     public String doCommand( String[] args, IUser user, IChannel chan )
@@ -27,7 +26,7 @@ public class AddSummonerCommand extends Command
         }
         if ( args.length < 3 )
         {
-            chan.sendMessage( "**Usage:** !addsummoner <platform> <summoner name...>" );
+            chan.sendMessage( "**Usage:** !removesummoner <platform> <summoner name...>" );
             return "Not enough args.";
         }
         Platform plat;
@@ -55,26 +54,19 @@ public class AddSummonerCommand extends Command
                 chan.sendMessage( "**Error:** Invalid Summoner." );
                 return "Invalid summoner.";
             }
-            ResultSet rs = LuxBot.DATABASE.prepareStatement( String.format( "SELECT * FROM `summoner_guilds` WHERE `guild_id`=%d AND `summoner_id`=%d AND platform='%s'", chan.getGuild().getLongID(), sum.getId(), plat.getName() ) ).executeQuery();
-            if ( rs.next() )
+            int rowsMod = LuxBot.DATABASE.prepareStatement( String.format( "DELETE FROM `summoner_guilds` WHERE `guild_id`=%d AND `summoner_id`=%d AND `platform`='%s'", chan.getGuild().getLongID(), sum.getId(), plat.getName() ) ).executeUpdate();
+            if ( rowsMod <= 0 )
             {
-                chan.sendMessage( "**Error:** This Summoner is already added." );
-                return "Already existing Summoner.";
+                chan.sendMessage( "*Error:** That Summoner is not added to your guild." );
+                return "Summoner not in guild. (guild " + chan.getGuild().getLongID() + "/" + chan.getGuild().getName() + " summoner " + sum.toString() + " platform " + plat.getName() + ")";
             }
-            LuxBot.DATABASE.prepareStatement( String.format( "INSERT INTO `summoner_guilds`(`guild_id`, `summoner_id`, `platform`) VALUES (%d,%d,'%s')", chan.getGuild().getLongID(), sum.getId(), plat.getName() ) ).executeUpdate();
-            TrackSummoner ts = new TrackSummoner( sum, plat );
-            ts.addGuild( new TrackGuild( chan.getGuild(), LuxBot.guildChannels.get( chan.getGuild() ) ) );
-            Match lg = LuxBot.getLastGame( sum, plat );
-            if ( lg == null )
+            if ( rowsMod > 1 )
             {
-                chan.sendMessage( "**Error:** No recent games for this Summoner. This error usually occurs when a Summoner has no recent games." );
-                return "No recent games?";
+                chan.sendMessage( "**Success:** Summoner " + sum.getName() + " is no longer part of your guild; however, SQL returned more than 1 rows modified?" );
+                return "Summoner " + sum.toString() + " (platform " + plat.getName() + ") is no longer part of guild " + chan.getGuild().getLongID() + "/" + chan.getGuild().getName() + " - SQL rows modded " + rowsMod + ", however.";
             }
-            ts.setLastGame( lg );
-            LuxBot.DATABASE.prepareStatement( String.format( "INSERT INTO `last_games`(`summoner_id`, `game_id`, `platform`) VALUES (%d,%d,'%s')", sum.getId(), lg.getGameId(), plat.getName() ) ).executeUpdate();
-            LuxBot.summoners.add( ts );
-            chan.sendMessage( "**Success:** Summoner " + sum.getName() + " is now part of your guild." );
-            return "Summoner " + sum.toString() + " (platform " + plat.getName() + ") is now part of guild " + chan.getGuild().getLongID() + "/" + chan.getGuild().getName();
+            chan.sendMessage( "**Success:** Summoner " + sum.getName() + " is no longer part of your guild." );
+            return "Summoner " + sum.toString() + " (platform " + plat.getName() + ") is no longer part of guild " + chan.getGuild().getLongID() + "/" + chan.getGuild().getName();
         } catch ( RiotApiException e )
         {
             chan.sendMessage( "**Error:** Invalid Summoner." );
