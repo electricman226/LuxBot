@@ -73,7 +73,7 @@ public class RemoveSummonerCommand extends Command
             return "Invalid summoner/drunk API.";
         } catch ( SQLException e )
         {
-            chan.sendMessage( "**Error:** There was an error whilst attempting to add that Summoner. (SQL error)" );
+            chan.sendMessage( "**Error:** There was an error whilst attempting to remove that Summoner. (SQL error)" );
             e.printStackTrace();
         }
         return null;
