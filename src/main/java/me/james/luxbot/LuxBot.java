@@ -192,6 +192,7 @@ public class LuxBot extends BaseBot
     public void init()
     {
         Command.registerClass( "!addsummoner", AddSummonerCommand.class );
+        Command.registerClass( "!removesummoner", RemoveSummonerCommand.class );
         Command.registerClass( "!setchannel", SetOutputChannelCommand.class );
         Command.registerClass( "!forceupdate", ForceUpdateCommand.class );
         Command.registerClass( "!sendmessage", SendGlobalMessageCommand.class );
