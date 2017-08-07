@@ -1,4 +1,4 @@
-After 24 hours, the following stats were made globally of those Summoners registered in our bot.
+After 24 hours, the following stats were made from the **%d** Summoners registered in our bot (**%d** guilds).
 
 Overall KDA: **%d/%d/%d**
 Wins: **%d**
@@ -32,4 +32,4 @@ Barrons Killed: **%d**
 Dragons Killed: **%d**
 Heralds Killed: **%d**
 
-*(these statistics were collected from %s EST to %s EST **(now)**)
+*(these statistics were collected from %s EST to %s EST **(now)**)*
