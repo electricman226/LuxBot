@@ -98,6 +98,7 @@ public class LuxBot extends BaseBot
         return String.format( fmt, s.getSummoner().getName(), ( pstats.getStats().isWin() ? "won" : "lost" ), ( map.isPresent() ? map.get().getMapName() : "Unknown" ), champ.getName(), pstats.getStats().getKills(), pstats.getStats().getDeaths(), pstats.getStats().getAssists(), pstats.getStats().getTotalMinionsKilled() + pstats.getStats().getNeutralMinionsKilled() );
     }
 
+    // TODO: This is fucking retarded. Store the timestamp and game id individually, and calculate what games in 24 hours based on the timestamp, not fucking this dumb shit.
     public static String formatGlobalStats() throws IOException, SQLException
     {
         if ( new File( "global_stats_format.txt" ).exists() )
