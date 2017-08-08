@@ -1,1 +1,1 @@
-Summoner **%s** has **%s** a game on **%s** playing **%s**. Their score was **%d/%d/%d** with **%d** CS.
+Summoner **%s** has **%s** a **%02d:%02d** game on **%s** playing **%s**. Their score was **%d/%d/%d** with **%d** CS.

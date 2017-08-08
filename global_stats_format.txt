@@ -3,6 +3,7 @@ After 24 hours, the following stats were made from the **%d** Summoners register
 Overall KDA: **%d/%d/%d**
 Wins: **%d**
 Losses: **%d**
+Overall life wasted: **%s**
 
 Total Damage: **%d**
 	- Magic Damage:       **%d**
