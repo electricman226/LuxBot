@@ -15,4 +15,4 @@ Due to certain limitations of the Riot API, only games that are **drafted** can 
 Getting a Summoner's grade is also not possible, as that is kept private.
 
 # Privacy
-By adding your own Summoner *(or a Summoner under an account that isn't owned by you)*, you acknowledge that statistics achieved on that Summoner for all drafted games are being **anonymously** tracked, recorded, and saved, being kept inside of a database; for no longer than **25 hours**.
+By adding your own Summoner *(or a Summoner under an account that isn't owned by you)*, you acknowledge that statistics achieved on that Summoner for all drafted games are being **anonymously** tracked, recorded, and saved, being kept inside of a database.
