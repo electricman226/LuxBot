@@ -29,8 +29,4 @@ Minions Killed: **%d**
 Wards Placed: **%d**
 Wards Killed: **%d**
 
-Barrons Killed: **%d**
-Dragons Killed: **%d**
-Heralds Killed: **%d**
-
 *(these statistics were collected from %s EST to %s EST **(now)**)*

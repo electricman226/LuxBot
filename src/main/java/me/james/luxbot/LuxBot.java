@@ -93,9 +93,14 @@ public class LuxBot extends BaseBot
                 return null;
         Participant pstats = m.getParticipantBySummonerId( s.getSummoner().getId() );
         Optional< MapDetails > map = RIOT_API.getDataMaps( s.getPlatform() ).getData().values().stream().filter( md -> md.getMapId() == m.getMapId() ).findFirst();
-        System.out.println( pstats.getChampionId() );
+        int ourTeamKills = 0, theirTeamKills = 0; // The fuck do I name these.
+        for ( Participant p : m.getParticipants() ) // Is this the best way to actually get the two teams?
+            if ( p.getTeamId() == pstats.getTeamId() )
+                ourTeamKills += p.getStats().getKills();
+            else
+                theirTeamKills += p.getStats().getKills();
         Champion champ = RIOT_API.getDataChampion( s.getPlatform(), pstats.getChampionId(), Locale.EN_US, null );
-        return String.format( fmt, s.getSummoner().getName(), ( pstats.getStats().isWin() ? "won" : "lost" ), m.getGameDuration() / 60, m.getGameCreation() % 60, ( map.isPresent() ? map.get().getMapName() : "Unknown" ), champ.getName(), pstats.getStats().getKills(), pstats.getStats().getDeaths(), pstats.getStats().getAssists(), pstats.getStats().getTotalMinionsKilled() + pstats.getStats().getNeutralMinionsKilled() );
+        return String.format( fmt, s.getSummoner().getName(), ( pstats.getStats().isWin() ? "won" : "lost" ), m.getGameDuration() / 60, m.getGameCreation() % 60, ( map.isPresent() ? map.get().getMapName() : "Unknown" ), champ.getName(), pstats.getStats().getKills(), pstats.getStats().getDeaths(), pstats.getStats().getAssists(), pstats.getStats().getTotalMinionsKilled() + pstats.getStats().getNeutralMinionsKilled(), ourTeamKills, theirTeamKills );
     }
 
     public static String formatTime( int secondsTime )
@@ -117,9 +122,10 @@ public class LuxBot extends BaseBot
             String fmt = new String( Files.readAllBytes( Paths.get( "global_stats_format.txt" ) ) );
             ResultSet rs = DATABASE.prepareStatement( String.format( "SELECT * FROM `global_stats` WHERE `timestamp` >= %d AND `timestamp` <= %d", getStartTime(), System.currentTimeMillis() ) ).executeQuery();
             // TODO: Probably a better way to define all these, or preform the calculations.
-            int kills = 0, deaths = 0, assists = 0, win = 0, loss = 0, duration = 0, total_damage = 0, magic_damage = 0, physical_damage = 0, true_damage = 0, tower_kills = 0, double_kills = 0, triple_kills = 0, quadra_kills = 0, penta_kills = 0, unreal_kills = 0, gold_earned = 0, minions_killed = 0, wards_placed = 0, wards_killed = 0, barron_kills = 0, dragon_kills = 0, herald_kills = 0, top_players = 0, jungle_players = 0, mid_players = 0, bot_players = 0;
+            int kills = 0, deaths = 0, assists = 0, win = 0, loss = 0, duration = 0, total_damage = 0, magic_damage = 0, physical_damage = 0, true_damage = 0, tower_kills = 0, double_kills = 0, triple_kills = 0, quadra_kills = 0, penta_kills = 0, unreal_kills = 0, gold_earned = 0, minions_killed = 0, wards_placed = 0, wards_killed = 0, top_players = 0, jungle_players = 0, mid_players = 0, bot_players = 0;
             while ( rs.next() )
             {
+                String lane = rs.getString( "lane" );
                 kills += rs.getInt( "kills" );
                 deaths += rs.getInt( "deaths" );
                 assists += rs.getInt( "assists" );
@@ -131,10 +137,10 @@ public class LuxBot extends BaseBot
                 physical_damage += rs.getInt( "physical_damage" );
                 true_damage += rs.getInt( "true_damage" );
                 tower_kills += rs.getInt( "tower_kills" );
-                top_players += rs.getInt( "top_players" );
-                jungle_players += rs.getInt( "jungle_players" );
-                mid_players += rs.getInt( "mid_players" );
-                bot_players += rs.getInt( "bot_players" );
+                top_players += ( lane.equalsIgnoreCase( "TOP" ) ? 1 : 0 );
+                jungle_players += ( lane.equalsIgnoreCase( "JUNGLE" ) ? 1 : 0 );
+                mid_players += ( lane.equalsIgnoreCase( "MIDDLE" ) ? 1 : 0 );
+                bot_players += ( lane.equalsIgnoreCase( "BOTTOM" ) ? 1 : 0 );
                 double_kills += rs.getInt( "double_kills" );
                 triple_kills += rs.getInt( "triple_kills" );
                 quadra_kills += rs.getInt( "quadra_kills" );
@@ -144,12 +150,9 @@ public class LuxBot extends BaseBot
                 minions_killed += rs.getInt( "minions_killed" );
                 wards_placed += rs.getInt( "wards_placed" );
                 wards_killed += rs.getInt( "wards_killed" );
-                barron_kills += rs.getInt( "barron_kills" );
-                dragon_kills += rs.getInt( "dragon_kills" );
-                herald_kills += rs.getInt( "herald_kills" );
             }
             // TODO: Add win rate calculations.
-            return String.format( fmt, summoners.size(), guildChannels.size(), kills, deaths, assists, win, loss, formatTime( duration ), total_damage, magic_damage, physical_damage, true_damage, tower_kills, top_players, jungle_players, mid_players, bot_players, double_kills, triple_kills, quadra_kills, penta_kills, unreal_kills, gold_earned, minions_killed, wards_placed, wards_killed, barron_kills, dragon_kills, herald_kills, new SimpleDateFormat( "MM/dd/yyyy hh:mm aa" ).format( new Date( getStartTime() ) ), new SimpleDateFormat( "MM/dd/yyyy hh:mm aa" ).format( new Date( System.currentTimeMillis() ) ) );
+            return String.format( fmt, summoners.size(), guildChannels.size(), kills, deaths, assists, win, loss, formatTime( duration ), total_damage, magic_damage, physical_damage, true_damage, tower_kills, top_players, jungle_players, mid_players, bot_players, double_kills, triple_kills, quadra_kills, penta_kills, unreal_kills, gold_earned, minions_killed, wards_placed, wards_killed, new SimpleDateFormat( "MM/dd/yyyy hh:mm aa" ).format( new Date( getStartTime() ) ), new SimpleDateFormat( "MM/dd/yyyy hh:mm aa" ).format( new Date( System.currentTimeMillis() ) ) );
         }
         return "If you see this message, blame " + BOT.getBot().getApplicationOwner().mention() + "/" + BOT.getBot().getApplicationOwner().getName() + "#" + BOT.getBot().getApplicationOwner().getDiscriminator() + "; they're retarded and didn't give me a format file to send.";
     }
@@ -175,7 +178,7 @@ public class LuxBot extends BaseBot
             if ( pstats == null ) // Wasn't a drafted game, can't report Summoner stats as we don't know who they are.
                 return;
             // TODO: Does this need to be so fucking long?
-            DATABASE.prepareStatement( String.format( "INSERT INTO `global_stats` (`timestamp`, `game_id`, `summoner_id`, `kills`, `deaths`, `assists`, `win`, `loss`, `duration`, `total_damage`, `magic_damage`, `physical_damage`, `true_damage`, `tower_kills`, `double_kills`, `triple_kills`, `quadra_kills`, `penta_kills`, `unreal_kills`, `gold_earned`, `minions_killed`, `wards_placed`, `wards_killed`, `barron_kills`, `dragon_kills`, `herald_kills`, `top_players`, `jungle_players`, `mid_players`, `bot_players`) VALUES(%d, %d, %d, %d, %d,%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d)", ( m.getGameCreation() ), m.getGameId(), sum.getSummoner().getId(), pstats.getStats().getKills(), pstats.getStats().getDeaths(), pstats.getStats().getAssists(), ( pstats.getStats().isWin() ? 1 : 0 ), ( !pstats.getStats().isWin() ? 1 : 0 ), m.getGameDuration(), pstats.getStats().getTotalDamageDealt(), pstats.getStats().getMagicDamageDealt(), pstats.getStats().getPhysicalDamageDealt(), pstats.getStats().getTrueDamageDealt(), pstats.getStats().getTurretKills(), pstats.getStats().getDoubleKills(), pstats.getStats().getTripleKills(), pstats.getStats().getQuadraKills(), pstats.getStats().getPentaKills(), pstats.getStats().getUnrealKills(), pstats.getStats().getGoldEarned(), pstats.getStats().getTotalMinionsKilled() + pstats.getStats().getNeutralMinionsKilled(), pstats.getStats().getWardsPlaced(), pstats.getStats().getWardsKilled(), m.getTeamByTeamId( pstats.getTeamId() ).getBaronKills(), m.getTeamByTeamId( pstats.getTeamId() ).getDragonKills(), m.getTeamByTeamId( pstats.getTeamId() ).getRiftHeraldKills(), ( pstats.getTimeline().getLane().equalsIgnoreCase( "TOP" ) ? 1 : 0 ), ( pstats.getTimeline().getLane().equalsIgnoreCase( "JUNGLE" ) ? 1 : 0 ), ( pstats.getTimeline().getLane().equalsIgnoreCase( "MIDDLE" ) ? 1 : 0 ), ( pstats.getTimeline().getLane().equalsIgnoreCase( "BOTTOM" ) ? 1 : 0 ) ) ).execute();
+            DATABASE.prepareStatement( String.format( "INSERT INTO `global_stats` (`timestamp`, `game_id`, `summoner_id`, `kills`, `deaths`, `assists`, `win`, `loss`, `duration`, `total_damage`, `magic_damage`, `physical_damage`, `true_damage`, `tower_kills`, `double_kills`, `triple_kills`, `quadra_kills`, `penta_kills`, `unreal_kills`, `gold_earned`, `minions_killed`, `wards_placed`, `wards_killed`, `lane`) VALUES(%d, %d, %d, %d, %d,%d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %s)", ( m.getGameCreation() ), m.getGameId(), sum.getSummoner().getId(), pstats.getStats().getKills(), pstats.getStats().getDeaths(), pstats.getStats().getAssists(), ( pstats.getStats().isWin() ? 1 : 0 ), ( !pstats.getStats().isWin() ? 1 : 0 ), m.getGameDuration(), pstats.getStats().getTotalDamageDealt(), pstats.getStats().getMagicDamageDealt(), pstats.getStats().getPhysicalDamageDealt(), pstats.getStats().getTrueDamageDealt(), pstats.getStats().getTurretKills(), pstats.getStats().getDoubleKills(), pstats.getStats().getTripleKills(), pstats.getStats().getQuadraKills(), pstats.getStats().getPentaKills(), pstats.getStats().getUnrealKills(), pstats.getStats().getGoldEarned(), pstats.getStats().getTotalMinionsKilled() + pstats.getStats().getNeutralMinionsKilled(), pstats.getStats().getWardsPlaced(), pstats.getStats().getWardsKilled(), pstats.getTimeline().getLane() ) ).execute();
         } catch ( SQLException e )
         {
             e.printStackTrace();
@@ -332,21 +335,7 @@ public class LuxBot extends BaseBot
             }
         } );
         updateThread.start();
-        boolean first = true;
         for ( TrackSummoner ts : summoners )
-        {
             getLogger().info( "Summoner " + ts.getSummoner().toString() + "'s last game is " + ts.getLastGame().getGameId() );
-            if ( first )
-            {
-                first = false;
-                try
-                {
-                    updateGlobalStats( ts, ts.getLastGame() );
-                } catch ( RiotApiException e )
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 }
