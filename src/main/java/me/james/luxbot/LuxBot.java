@@ -29,6 +29,7 @@ public class LuxBot extends BaseBot
     public static ArrayList< TrackSummoner > summoners = new ArrayList<>();
     public static HashMap< IGuild, IChannel > guildChannels = new HashMap<>();
     private static Thread updateThread;
+    private static int updateCount;
 
     public LuxBot()
     {
@@ -169,6 +170,18 @@ public class LuxBot extends BaseBot
         return 0L;
     }
 
+    public static long getLastUpdateTime()
+    {
+        try
+        {
+            return Long.parseLong( new String( Files.readAllBytes( Paths.get( "last_update_time" ) ) ) );
+        } catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
+        return 0L;
+    }
+
     public static void updateGlobalStats( TrackSummoner sum, Match m ) throws RiotApiException
     {
         BOT.getLogger().info( "Updating global stats for match " + m.getGameId() );
@@ -187,6 +200,14 @@ public class LuxBot extends BaseBot
 
     public static void update()
     {
+        updateCount++;
+        try
+        {
+            Files.write( Paths.get( "last_update_time" ), String.valueOf( System.currentTimeMillis() ).getBytes(), StandardOpenOption.CREATE );
+        } catch ( IOException e )
+        {
+            e.printStackTrace();
+        }
         BOT.getBot().changePlayingText( "Reporting summoner games..." );
         BOT.getLogger().info( "Beginning to update games..." );
         for ( TrackSummoner sum : summoners )
@@ -325,7 +346,7 @@ public class LuxBot extends BaseBot
             {
                 try
                 {
-                    Thread.sleep( LUXBOT_UPDATE_RATE );
+                    Thread.sleep( ( updateCount >= 1 ? LUXBOT_UPDATE_RATE : getLastUpdateTime() % LUXBOT_UPDATE_RATE ) ); // This prevents update misalignment when the program is restarted. (meaning it will always be aligned to the start time)
                 } catch ( InterruptedException e )
                 {
                     e.printStackTrace();
