@@ -346,7 +346,9 @@ public class LuxBot extends BaseBot
             {
                 try
                 {
-                    Thread.sleep( ( updateCount >= 1 ? LUXBOT_UPDATE_RATE : getLastUpdateTime() % LUXBOT_UPDATE_RATE ) ); // This prevents update misalignment when the program is restarted. (meaning it will always be aligned to the start time)
+                    long sleepTime = ( updateCount >= 1 ? LUXBOT_UPDATE_RATE : getLastUpdateTime() % LUXBOT_UPDATE_RATE );
+                    System.out.println( "Updating in " + sleepTime + " milliseconds (" + sleepTime / 1000 + " seconds)" );
+                    Thread.sleep( sleepTime ); // This prevents update misalignment when the program is restarted. (meaning it will always be aligned to the start time)
                 } catch ( InterruptedException e )
                 {
                     e.printStackTrace();
